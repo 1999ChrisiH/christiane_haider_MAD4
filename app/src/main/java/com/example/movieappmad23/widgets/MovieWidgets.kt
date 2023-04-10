@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -41,6 +42,7 @@ fun MovieRow(
     modifier: Modifier = Modifier,
     onItemClick: (String) -> Unit = {}
 ) {
+
     Card(modifier = modifier
         .clickable {
             onItemClick(movie.id)
@@ -84,15 +86,30 @@ fun MovieImage(imageUrl: String) {
 
 @Composable
 fun FavoriteIcon() {
+    var onFavoriteClicked by remember{
+        mutableStateOf(false)
+    }
+
     Box(modifier = Modifier
         .fillMaxSize()
         .padding(10.dp),
         contentAlignment = Alignment.TopEnd
     ){
-        Icon(
-            tint = MaterialTheme.colors.secondary,
-            imageVector = Icons.Default.FavoriteBorder,
-            contentDescription = "Add to favorites")
+        IconButton(
+            onClick = { onFavoriteClicked = !onFavoriteClicked }) {
+            Icon(imageVector =
+            if (onFavoriteClicked){
+                Icons.Default.Favorite
+            }
+            else {
+                Icons.Default.FavoriteBorder
+            },
+                contentDescription = "add to favorites",
+                modifier = Modifier
+                    .size(25.dp),
+                tint = Color.DarkGray
+            )
+        }
     }
 }
 
