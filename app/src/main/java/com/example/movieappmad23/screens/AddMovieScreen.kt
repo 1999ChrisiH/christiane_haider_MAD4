@@ -81,14 +81,15 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
                 errorState = moviesViewModel.titleError,
                 validateMethod = {moviesViewModel.validateTitle()}
                 )
+            PrintErrorMsg(value = moviesViewModel.titleError.value, text = stringResource(R.string.invalid_input))
 
-            PrintErrorMsg(value = moviesViewModel.yearError.value)
             InputField(
                 text = moviesViewModel.year,
                 label = R.string.enter_movie_year,
                 errorState = moviesViewModel.yearError,
                 validateMethod = {moviesViewModel.validateYear()}
             )
+            PrintErrorMsg(value = moviesViewModel.yearError.value, text = stringResource(R.string.invalid_input))
 
             Text(
                 modifier = Modifier.padding(top = 4.dp),
@@ -97,7 +98,7 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
                 style = MaterialTheme.typography.h6
             )
 
-            PrintErrorMsg(value = moviesViewModel.genreError.value)
+            PrintErrorMsg(value = moviesViewModel.genreError.value, text = stringResource(R.string.choose_genre))
 
             LazyHorizontalGrid(
                 modifier = Modifier.height(100.dp),
@@ -134,6 +135,8 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
                 errorState = moviesViewModel.directorError,
                 validateMethod = {moviesViewModel.validateDirector()}
             )
+            PrintErrorMsg(value = moviesViewModel.directorError.value, text = stringResource(R.string.invalid_input))
+
 
             InputField(
                 text = moviesViewModel.actors,
@@ -141,6 +144,8 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
                 errorState = moviesViewModel.actorsError,
                 validateMethod = {moviesViewModel.validateActors()}
             )
+            PrintErrorMsg(value = moviesViewModel.actorsError.value, text = stringResource(R.string.invalid_input))
+
 
             InputField(
                 text = moviesViewModel.plot,
@@ -148,6 +153,8 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
                 errorState = moviesViewModel.plotError,
                 validateMethod = {moviesViewModel.validatePlot()}
             )
+            PrintErrorMsg(value = moviesViewModel.plotError.value, text = stringResource(R.string.invalid_input))
+
 
             InputField(
                 text = moviesViewModel.rating,
@@ -155,6 +162,8 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
                 errorState = moviesViewModel.ratingError,
                 validateMethod = {moviesViewModel.validateRating()}
             )
+            PrintErrorMsg(value = moviesViewModel.yearError.value, text = stringResource(R.string.decimal_number))
+
 
             Button(
                 enabled = moviesViewModel.addButtonEnabled.value,
@@ -182,10 +191,10 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
 }
 
 @Composable
-fun PrintErrorMsg(value: Boolean) {
+fun PrintErrorMsg(value: Boolean, text: String) {
     if (value) {
         Text(
-            text = stringResource(R.string.invalid_input),
+            text = text,
             fontSize = 12.sp,
             color = Color.Red
         )

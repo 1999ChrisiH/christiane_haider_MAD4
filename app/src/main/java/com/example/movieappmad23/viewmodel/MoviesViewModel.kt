@@ -110,31 +110,26 @@ class MoviesViewModel: ViewModel(){
 
     fun validateTitle() {
         titleError.value = title.value.isEmpty()
-//        Log.d(TAG, "TitleError: ${titleError.value}") //For Debugging
         enableAddButton()
     }
 
     fun validateYear() {
         yearError.value = year.value.isEmpty()
-//        Log.d(TAG, "YearError: ${yearError.value}") //For Debugging
         enableAddButton()
     }
 
     fun validateDirector() {
         directorError.value = director.value.isEmpty()
-//        Log.d(TAG, "DirectorError: ${directorError.value}") //For Debugging
         enableAddButton()
     }
 
     fun validateActors() {
         actorsError.value = actors.value.isEmpty()
-//        Log.d(TAG, "ActorsError: ${actorsError.value}") //For Debugging
         enableAddButton()
     }
 
     fun validatePlot() {
         plotError.value = plot.value.isEmpty()
-//        Log.d(TAG, "PlotError: ${plotError.value}") //For Debugging
         enableAddButton()
     }
 
@@ -145,7 +140,6 @@ class MoviesViewModel: ViewModel(){
         } catch (e: java.lang.Exception) {
             ratingError.value = true
         } finally {
-//            Log.d(TAG, "RatingError: ${ratingError.value}") //For Debugging
             enableAddButton()
         }
     }
