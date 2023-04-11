@@ -12,12 +12,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewModel: MoviesViewModel by viewModels()
-        viewModel.movieList
+        val moviesViewModel: MoviesViewModel by viewModels()
 
         setContent {
             MovieAppMAD23Theme {
-                Navigation()
+                Navigation(moviesViewModel = moviesViewModel)
             }
         }
     }

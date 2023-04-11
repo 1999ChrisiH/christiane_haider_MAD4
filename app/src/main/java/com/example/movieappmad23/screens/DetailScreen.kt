@@ -9,20 +9,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.movieappmad23.models.Movie
 import com.example.movieappmad23.models.getMovies
+import com.example.movieappmad23.viewmodel.MoviesViewModel
 import com.example.movieappmad23.widgets.HorizontalScrollableImageView
 import com.example.movieappmad23.widgets.MovieRow
 import com.example.movieappmad23.widgets.SimpleTopAppBar
 
-fun filterMovie(movieId: String): Movie {
-    return getMovies().filter { it.id == movieId}[0]
-}
+
 @Composable
 fun DetailScreen(
     navController: NavController,
-    movieId:String?){
+    moviesViewModel: MoviesViewModel,
+    movieId: String?){
 
     movieId?.let {
-        val movie = filterMovie(movieId = movieId)
+        val movie = moviesViewModel.movieList.filter{it.id == movieId}[0]
 
         // needed for show/hide snackbar
         val scaffoldState = rememberScaffoldState() // this contains the `SnackbarHostState`
@@ -34,13 +34,13 @@ fun DetailScreen(
                 }
             },
         ) { padding ->
-            MainContent(Modifier.padding(padding), movie)
+            MainContent(Modifier.padding(padding), movie, moviesViewModel = moviesViewModel)
         }
     }
 }
 
 @Composable
-fun MainContent(modifier: Modifier = Modifier, movie: Movie) {
+fun MainContent(modifier: Modifier = Modifier, movie: Movie, moviesViewModel: MoviesViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,7 +52,7 @@ fun MainContent(modifier: Modifier = Modifier, movie: Movie) {
             verticalArrangement = Arrangement.Top
         ) {
 
-            MovieRow(movie = movie)
+            MovieRow(movie = movie, onFavClick = {movieId -> moviesViewModel.toggleFavorite(movieId)})
 
             Spacer(modifier = Modifier.height(8.dp))
 

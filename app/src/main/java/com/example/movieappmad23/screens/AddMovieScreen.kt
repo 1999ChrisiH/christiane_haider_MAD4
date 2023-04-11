@@ -18,10 +18,11 @@ import androidx.navigation.NavController
 import com.example.movieappmad23.R
 import com.example.movieappmad23.models.Genre
 import com.example.movieappmad23.models.ListItemSelectable
+import com.example.movieappmad23.viewmodel.MoviesViewModel
 import com.example.movieappmad23.widgets.SimpleTopAppBar
 
 @Composable
-fun AddMovieScreen(navController: NavController){
+fun AddMovieScreen(navController: NavController, moviesViewModel: MoviesViewModel){
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(

@@ -17,14 +17,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.movieappmad23.models.Movie
 import com.example.movieappmad23.models.getMovies
+import com.example.movieappmad23.viewmodel.MoviesViewModel
 import com.example.movieappmad23.widgets.HomeTopAppBar
 import com.example.movieappmad23.widgets.MovieRow
 
 @Composable
-fun HomeScreen(navController: NavController = rememberNavController()){
+fun HomeScreen(navController: NavController = rememberNavController(), moviesViewModel: MoviesViewModel){
     Scaffold(topBar = {
         HomeTopAppBar(
-            title = "Home",
+            title = "Movies" +
+                    "",
             menuContent = {
                 DropdownMenuItem(onClick = { navController.navigate(Screen.AddMovieScreen.route) }) {
                     Row {

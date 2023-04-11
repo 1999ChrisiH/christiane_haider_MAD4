@@ -1,5 +1,9 @@
 package com.example.movieappmad23.models
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+
 data class Movie(
     val id: String,
     val title: String,
@@ -10,8 +14,10 @@ data class Movie(
     val plot: String,
     val images: List<String>,
     val rating: Float = 0f,
-    var isFavorite: Boolean = false
-)
+    var initialFavValue: Boolean = false
+){
+    var isFavorite by mutableStateOf(initialFavValue)
+}
 
 fun getMovies(): List<Movie> {
     return listOf(

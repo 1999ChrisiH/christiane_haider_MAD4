@@ -40,7 +40,8 @@ import com.example.movieappmad23.ui.theme.Shapes
 fun MovieRow(
     movie: Movie = getMovies()[0],
     modifier: Modifier = Modifier,
-    onItemClick: (String) -> Unit = {}
+    onItemClick: (String) -> Unit = {},
+    onFavClick: (Movie) -> Unit = {}
 ) {
 
     Card(modifier = modifier
@@ -53,13 +54,14 @@ fun MovieRow(
         elevation = 10.dp
     ) {
         Column {
-            Box(modifier = Modifier
-                .height(150.dp)
-                .fillMaxWidth(),
+            Box(
+                modifier = Modifier
+                    .height(150.dp)
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 MovieImage(imageUrl = movie.images[0])
-                FavoriteIcon()
+                FavoriteIcon(onFavClick, movie)
             }
 
             MovieDetails(modifier = Modifier.padding(12.dp), movie = movie)
@@ -85,31 +87,27 @@ fun MovieImage(imageUrl: String) {
 }
 
 @Composable
-fun FavoriteIcon() {
-    var onFavoriteClicked by remember{
-        mutableStateOf(false)
-    }
-
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(10.dp),
+fun FavoriteIcon(onFavClick: (Movie) -> Unit, movie: Movie) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp),
         contentAlignment = Alignment.TopEnd
-    ){
-        IconButton(
-            onClick = { onFavoriteClicked = !onFavoriteClicked }) {
-            Icon(imageVector =
-            if (onFavoriteClicked){
+    ) {
+        Icon(
+            tint = MaterialTheme.colors.error,
+            imageVector =
+            if (movie.isFavorite) {
                 Icons.Default.Favorite
-            }
-            else {
+            } else {
                 Icons.Default.FavoriteBorder
             },
-                contentDescription = "add to favorites",
-                modifier = Modifier
-                    .size(25.dp),
-                tint = Color.DarkGray
-            )
-        }
+            contentDescription = "Add to favorites",
+            modifier = Modifier
+                .clickable {
+                    onFavClick(movie)
+                }
+        )
     }
 }
 
@@ -134,9 +132,10 @@ fun MovieDetails(modifier: Modifier = Modifier, movie: Movie) {
         IconButton(
             modifier = Modifier.weight(1f),
             onClick = { expanded = !expanded }) {
-            Icon(imageVector =
-            if (expanded) Icons.Filled.KeyboardArrowDown
-            else Icons.Filled.KeyboardArrowUp,
+            Icon(
+                imageVector =
+                if (expanded) Icons.Filled.KeyboardArrowDown
+                else Icons.Filled.KeyboardArrowUp,
                 contentDescription = "expand",
                 modifier = Modifier
                     .size(25.dp),
@@ -150,7 +149,7 @@ fun MovieDetails(modifier: Modifier = Modifier, movie: Movie) {
         enter = fadeIn(),
         exit = fadeOut()
     ) {
-        Column (modifier = modifier) {
+        Column(modifier = modifier) {
             Text(text = "Director: ${movie.director}", style = MaterialTheme.typography.caption)
             Text(text = "Released: ${movie.year}", style = MaterialTheme.typography.caption)
             Text(text = "Genre: ${movie.genre}", style = MaterialTheme.typography.caption)
@@ -163,7 +162,13 @@ fun MovieDetails(modifier: Modifier = Modifier, movie: Movie) {
                 withStyle(style = SpanStyle(color = Color.DarkGray, fontSize = 13.sp)) {
                     append("Plot: ")
                 }
-                withStyle(style = SpanStyle(color = Color.DarkGray, fontSize = 13.sp, fontWeight = FontWeight.Light)){
+                withStyle(
+                    style = SpanStyle(
+                        color = Color.DarkGray,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                ) {
                     append(movie.plot)
                 }
             })
