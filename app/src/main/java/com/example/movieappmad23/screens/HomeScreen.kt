@@ -15,8 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.movieappmad23.models.Movie
-import com.example.movieappmad23.models.getMovies
 import com.example.movieappmad23.viewmodel.MoviesViewModel
 import com.example.movieappmad23.widgets.HomeTopAppBar
 import com.example.movieappmad23.widgets.MovieRow
@@ -97,7 +95,7 @@ fun MovieList(
                     navController.navigate(Screen.DetailScreen.withId(movieId))
                 },
                 onFavClick = { movieId ->
-                    moviesViewModel.toggleFavorite(movieId)
+                    moviesViewModel.likeFavoriteMovies(movieId)
                 }
             )
         }

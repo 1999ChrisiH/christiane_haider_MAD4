@@ -10,19 +10,20 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.movieappmad23.R
 import com.example.movieappmad23.models.Genre
-import com.example.movieappmad23.models.ListItemSelectable
 import com.example.movieappmad23.viewmodel.MoviesViewModel
 import com.example.movieappmad23.widgets.SimpleTopAppBar
 
 @Composable
-fun AddMovieScreen(navController: NavController, moviesViewModel: MoviesViewModel){
+fun AddMovieScreen(navController: NavController, moviesViewModel: MoviesViewModel) {
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -33,13 +34,34 @@ fun AddMovieScreen(navController: NavController, moviesViewModel: MoviesViewMode
             }
         },
     ) { padding ->
-        MainContent(Modifier.padding(padding))
+        MainContent(Modifier.padding(padding), moviesViewModel = moviesViewModel)
     }
+    moviesViewModel.validation()
 }
+
+@Composable
+fun InputField(
+    text: MutableState<String>,
+    errorState: MutableState<Boolean>,
+    label: Int,
+    validateMethod: () -> Unit
+) {
+    OutlinedTextField(
+        value = text.value,
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        onValueChange = {
+            text.value = it
+            validateMethod()
+        },
+        label = { Text(stringResource(id = label)) },
+    )
+}
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MainContent(modifier: Modifier = Modifier) {
+fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel) {
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -53,76 +75,35 @@ fun MainContent(modifier: Modifier = Modifier) {
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.Start
         ) {
-
-            var title by remember {
-                mutableStateOf("")
-            }
-
-            var year by remember {
-                mutableStateOf("")
-            }
-
-            val genres = Genre.values().toList()
-
-            var genreItems by remember {
-                mutableStateOf(
-                    genres.map { genre ->
-                        ListItemSelectable(
-                            title = genre.toString(),
-                            isSelected = false
-                        )
-                    }
+            InputField(
+                text = moviesViewModel.title,
+                label = R.string.enter_movie_title,
+                errorState = moviesViewModel.titleError,
+                validateMethod = {moviesViewModel.validateTitle()}
                 )
-            }
 
-            var director by remember {
-                mutableStateOf("")
-            }
-
-            var actors by remember {
-                mutableStateOf("")
-            }
-
-            var plot by remember {
-                mutableStateOf("")
-            }
-
-            var rating by remember {
-                mutableStateOf("")
-            }
-
-            var isEnabledSaveButton by remember {
-                mutableStateOf(true)
-            }
-
-            OutlinedTextField(
-                value = title,
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = { title = it },
-                label = { Text(text = stringResource(R.string.enter_movie_title)) },
-                isError = false
-            )
-
-            OutlinedTextField(
-                value = year,
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = { year = it },
-                label = { Text(stringResource(R.string.enter_movie_year)) },
-                isError = false
+            PrintErrorMsg(value = moviesViewModel.yearError.value)
+            InputField(
+                text = moviesViewModel.year,
+                label = R.string.enter_movie_year,
+                errorState = moviesViewModel.yearError,
+                validateMethod = {moviesViewModel.validateYear()}
             )
 
             Text(
                 modifier = Modifier.padding(top = 4.dp),
                 text = stringResource(R.string.select_genres),
                 textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.h6)
+                style = MaterialTheme.typography.h6
+            )
+
+            PrintErrorMsg(value = moviesViewModel.genreError.value)
 
             LazyHorizontalGrid(
                 modifier = Modifier.height(100.dp),
-                rows = GridCells.Fixed(3)){
-                items(genreItems) { genreItem ->
+                rows = GridCells.Fixed(3)
+            ) {
+                items(moviesViewModel.genreItems.value) { genreItem ->
                     Chip(
                         modifier = Modifier.padding(2.dp),
                         colors = ChipDefaults.chipColors(
@@ -132,13 +113,14 @@ fun MainContent(modifier: Modifier = Modifier) {
                                 colorResource(id = R.color.white)
                         ),
                         onClick = {
-                            genreItems = genreItems.map {
-                                if (it.title == genreItem.title) {
-                                    genreItem.copy(isSelected = !genreItem.isSelected)
-                                } else {
-                                    it
+                            moviesViewModel.genreItems.value =
+                                moviesViewModel.genreItems.value.map {
+                                    if (it.title == genreItem.title) {
+                                        genreItem.copy(isSelected = !genreItem.isSelected)
+                                    } else {
+                                        it
+                                    }
                                 }
-                            }
                         }
                     ) {
                         Text(text = genreItem.title)
@@ -146,54 +128,66 @@ fun MainContent(modifier: Modifier = Modifier) {
                 }
             }
 
-            OutlinedTextField(
-                value = director,
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = { director = it },
-                label = { Text(stringResource(R.string.enter_director)) },
-                isError = false
+            InputField(
+                text = moviesViewModel.director,
+                label = R.string.enter_director,
+                errorState = moviesViewModel.directorError,
+                validateMethod = {moviesViewModel.validateDirector()}
             )
 
-            OutlinedTextField(
-                value = actors,
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = { actors = it },
-                label = { Text(stringResource(R.string.enter_actors)) },
-                isError = false
+            InputField(
+                text = moviesViewModel.actors,
+                label = R.string.enter_actors,
+                errorState = moviesViewModel.actorsError,
+                validateMethod = {moviesViewModel.validateActors()}
             )
 
-            OutlinedTextField(
-                value = plot,
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                onValueChange = { plot = it },
-                label = { Text(textAlign = TextAlign.Start, text = stringResource(R.string.enter_plot)) },
-                isError = false
+            InputField(
+                text = moviesViewModel.plot,
+                label = R.string.enter_plot,
+                errorState = moviesViewModel.plotError,
+                validateMethod = {moviesViewModel.validatePlot()}
             )
 
-            OutlinedTextField(
-                value = rating,
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = {
-                                rating = if(it.startsWith("0")) {
-                                    ""
-                                } else {
-                                    it
-                                }
-                },
-                label = { Text(stringResource(R.string.enter_rating)) },
-                isError = false
+            InputField(
+                text = moviesViewModel.rating,
+                label = R.string.enter_rating,
+                errorState = moviesViewModel.ratingError,
+                validateMethod = {moviesViewModel.validateRating()}
             )
 
             Button(
-                enabled = isEnabledSaveButton,
-                onClick = { /*TODO add a new movie to the movie list*/ }) {
+                enabled = moviesViewModel.addButtonEnabled.value,
+                /*TODO add a new movie to the movie list*/
+                onClick = {
+                    val genreList: MutableList<Genre> = mutableListOf()
+                    moviesViewModel.genreItems.value.filter { it.isSelected }
+                        .forEach { genreList.add(Genre.valueOf(it.title)) }
+
+                    moviesViewModel.addMovie(
+                        moviesViewModel.title.value,
+                        moviesViewModel.year.value,
+                        genreList,
+                        moviesViewModel.director.value,
+                        moviesViewModel.actors.value,
+                        moviesViewModel.plot.value,
+                        moviesViewModel.rating.value
+                    )
+                }) {
                 Text(text = stringResource(R.string.add))
             }
         }
+    }
+
+}
+
+@Composable
+fun PrintErrorMsg(value: Boolean) {
+    if (value) {
+        Text(
+            text = stringResource(R.string.invalid_input),
+            fontSize = 12.sp,
+            color = Color.Red
+        )
     }
 }

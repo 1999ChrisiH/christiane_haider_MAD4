@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.movieappmad23.models.Movie
-import com.example.movieappmad23.models.getMovies
 import com.example.movieappmad23.viewmodel.MoviesViewModel
 import com.example.movieappmad23.widgets.HorizontalScrollableImageView
 import com.example.movieappmad23.widgets.MovieRow
@@ -52,7 +51,7 @@ fun MainContent(modifier: Modifier = Modifier, movie: Movie, moviesViewModel: Mo
             verticalArrangement = Arrangement.Top
         ) {
 
-            MovieRow(movie = movie, onFavClick = {movieId -> moviesViewModel.toggleFavorite(movieId)})
+            MovieRow(movie = movie, onFavClick = {movieId -> moviesViewModel.likeFavoriteMovies(movieId)})
 
             Spacer(modifier = Modifier.height(8.dp))
 
