@@ -3,6 +3,7 @@ package com.example.movieappmad23.widgets
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -32,21 +34,20 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.movieappmad23.R
 import com.example.movieappmad23.models.Movie
-import com.example.movieappmad23.models.getMovies
 import com.example.movieappmad23.ui.theme.Shapes
 
 @Preview
 @Composable
 fun MovieRow(
-    movie: Movie = getMovies()[0],
+    movie: Movie = Movie(),
     modifier: Modifier = Modifier,
-    onItemClick: (String) -> Unit = {},
+    onMovieRowClick: (String) -> Unit = {},
     onFavClick: (Movie) -> Unit = {}
 ) {
 
     Card(modifier = modifier
         .clickable {
-            onItemClick(movie.id)
+            onMovieRowClick(movie.id)
         }
         .fillMaxWidth()
         .padding(5.dp),
@@ -54,14 +55,17 @@ fun MovieRow(
         elevation = 10.dp
     ) {
         Column {
-            Box(
-                modifier = Modifier
-                    .height(150.dp)
-                    .fillMaxWidth(),
+            Box(modifier = Modifier
+                .height(150.dp)
+                .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                MovieImage(imageUrl = movie.images[0])
-                FavoriteIcon(onFavClick, movie)
+                if(movie.images.isNotEmpty()){
+                    MovieImage(imageUrl = movie.images[0])
+                } else {
+                    Image(painter = painterResource(id = R.drawable.avatar2), contentDescription = "Prev Image")
+                }
+                FavoriteIcon(movie, onFavClick)
             }
 
             MovieDetails(modifier = Modifier.padding(12.dp), movie = movie)
@@ -87,13 +91,13 @@ fun MovieImage(imageUrl: String) {
 }
 
 @Composable
-fun FavoriteIcon(onFavClick: (Movie) -> Unit, movie: Movie) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp),
+fun FavoriteIcon(movie: Movie, onFavClick: (Movie) -> Unit) {
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(10.dp),
         contentAlignment = Alignment.TopEnd
-    ) {
+    ){
         Icon(
             tint = MaterialTheme.colors.error,
             imageVector =
@@ -103,10 +107,9 @@ fun FavoriteIcon(onFavClick: (Movie) -> Unit, movie: Movie) {
                 Icons.Default.FavoriteBorder
             },
             contentDescription = "Add to favorites",
-            modifier = Modifier
-                .clickable {
-                    onFavClick(movie)
-                }
+            modifier = Modifier.clickable {
+                onFavClick(movie)
+            }
         )
     }
 }
@@ -132,10 +135,9 @@ fun MovieDetails(modifier: Modifier = Modifier, movie: Movie) {
         IconButton(
             modifier = Modifier.weight(1f),
             onClick = { expanded = !expanded }) {
-            Icon(
-                imageVector =
-                if (expanded) Icons.Filled.KeyboardArrowDown
-                else Icons.Filled.KeyboardArrowUp,
+            Icon(imageVector =
+            if (expanded) Icons.Filled.KeyboardArrowDown
+            else Icons.Filled.KeyboardArrowUp,
                 contentDescription = "expand",
                 modifier = Modifier
                     .size(25.dp),
@@ -149,10 +151,20 @@ fun MovieDetails(modifier: Modifier = Modifier, movie: Movie) {
         enter = fadeIn(),
         exit = fadeOut()
     ) {
-        Column(modifier = modifier) {
+        Column (modifier = modifier) {
             Text(text = "Director: ${movie.director}", style = MaterialTheme.typography.caption)
             Text(text = "Released: ${movie.year}", style = MaterialTheme.typography.caption)
-            Text(text = "Genre: ${movie.genre}", style = MaterialTheme.typography.caption)
+            Text(buildAnnotatedString {
+                withStyle(style = SpanStyle(color = Color.DarkGray, fontSize = 13.sp)) {
+                    append("Genres: ")
+                }
+
+                for ( genre in movie.genre){
+                    append("$genre ")
+                }
+            },
+                style = MaterialTheme.typography.caption
+            )
             Text(text = "Actors: ${movie.actors}", style = MaterialTheme.typography.caption)
             Text(text = "Rating: ${movie.rating}", style = MaterialTheme.typography.caption)
 
@@ -162,13 +174,7 @@ fun MovieDetails(modifier: Modifier = Modifier, movie: Movie) {
                 withStyle(style = SpanStyle(color = Color.DarkGray, fontSize = 13.sp)) {
                     append("Plot: ")
                 }
-                withStyle(
-                    style = SpanStyle(
-                        color = Color.DarkGray,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Light
-                    )
-                ) {
+                withStyle(style = SpanStyle(color = Color.DarkGray, fontSize = 13.sp, fontWeight = FontWeight.Light)){
                     append(movie.plot)
                 }
             })

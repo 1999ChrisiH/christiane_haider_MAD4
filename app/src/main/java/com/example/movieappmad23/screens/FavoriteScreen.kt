@@ -12,32 +12,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.movieappmad23.viewmodel.MoviesViewModel
+import com.example.movieappmad23.viewmodel.FavoritesViewModel
 import com.example.movieappmad23.widgets.MovieRow
 import com.example.movieappmad23.widgets.SimpleTopAppBar
 import kotlinx.coroutines.launch
 
 @Composable
-fun FavoriteScreen(navController: NavController, moviesViewModel: MoviesViewModel){
-    val favoriteMoviesState by moviesViewModel.favoriteMovies.collectAsState()
+fun FavoriteScreen(navController: NavController, favViewModel: FavoritesViewModel) {
+
+    val favoriteMoviesState by favViewModel.favoriteMoviesState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(topBar = {
         SimpleTopAppBar(arrowBackClicked = { navController.popBackStack() }) {
             Text(text = "My Favorite Movies")
         }
-    }){ padding ->
+    }) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             LazyColumn {
-                items(favoriteMoviesState){ movie ->
+                items(favoriteMoviesState) { movie ->
                     MovieRow(
                         movie = movie,
-                        onItemClick = { movieId ->
+                        onMovieRowClick = { movieId ->
                             navController.navigate(route = Screen.DetailScreen.withId(movieId))
                         },
                         onFavClick = { likedMovie ->
-                            coroutineScope.launch{
-                                moviesViewModel.likeFavoriteMovie(likedMovie)
+                            coroutineScope.launch {
+                                favViewModel.updateFavoriteMovies(likedMovie)
                             }
                         }
                     )

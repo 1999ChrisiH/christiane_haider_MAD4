@@ -9,23 +9,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.movieappmad23.models.Movie
-import com.example.movieappmad23.viewmodel.MoviesViewModel
+import com.example.movieappmad23.viewmodel.HomeViewModel
 import com.example.movieappmad23.widgets.HorizontalScrollableImageView
 import com.example.movieappmad23.widgets.MovieRow
 import com.example.movieappmad23.widgets.SimpleTopAppBar
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun DetailScreen(
     navController: NavController,
-    moviesViewModel: MoviesViewModel,
+    detailViewModel: HomeViewModel,
     movieId:String?) {
 
     val coroutineScope = rememberCoroutineScope()
 
     movieId?.let {
-        val movie = moviesViewModel.movies.value.filter { it.id == movieId  }[0]
+        val movie = detailViewModel.movieListState.value.filter { it.id == movieId  }[0]
         val scaffoldState = rememberScaffoldState() // this contains the `SnackbarHostState`
 
         Scaffold(scaffoldState = scaffoldState, // attaching `scaffoldState` to the `Scaffold`
@@ -40,7 +39,7 @@ fun DetailScreen(
                 movie,
                 onFavClick = { movie ->
                     coroutineScope.launch {
-                        moviesViewModel.likeFavoriteMovie(movie)
+                        detailViewModel.updateFavoriteMovies(movie)
                     }
                 }
             )
