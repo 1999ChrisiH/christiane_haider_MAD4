@@ -3,6 +3,7 @@ package com.example.movieappmad23.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,18 +13,19 @@ import com.example.movieappmad23.viewmodel.MoviesViewModel
 import com.example.movieappmad23.widgets.HorizontalScrollableImageView
 import com.example.movieappmad23.widgets.MovieRow
 import com.example.movieappmad23.widgets.SimpleTopAppBar
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun DetailScreen(
     navController: NavController,
     moviesViewModel: MoviesViewModel,
-    movieId: String?){
+    movieId:String?) {
+
+    val coroutineScope = rememberCoroutineScope()
 
     movieId?.let {
-        val movie = moviesViewModel.movieList.filter{it.id == movieId}[0]
-
-        // needed for show/hide snackbar
+        val movie = moviesViewModel.movies.value.filter { it.id == movieId  }[0]
         val scaffoldState = rememberScaffoldState() // this contains the `SnackbarHostState`
 
         Scaffold(scaffoldState = scaffoldState, // attaching `scaffoldState` to the `Scaffold`
@@ -33,15 +35,27 @@ fun DetailScreen(
                 }
             },
         ) { padding ->
-            MainContent(Modifier.padding(padding), movie, moviesViewModel = moviesViewModel)
+            MainContent(
+                Modifier.padding(padding),
+                movie,
+                onFavClick = { movie ->
+                    coroutineScope.launch {
+                        moviesViewModel.likeFavoriteMovie(movie)
+                    }
+                }
+            )
         }
     }
 }
 
 @Composable
-fun MainContent(modifier: Modifier = Modifier, movie: Movie, moviesViewModel: MoviesViewModel) {
+fun MainContent(
+    modifier: Modifier = Modifier,
+    movie: Movie,
+    onFavClick: (Movie) -> Unit
+) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
@@ -51,7 +65,12 @@ fun MainContent(modifier: Modifier = Modifier, movie: Movie, moviesViewModel: Mo
             verticalArrangement = Arrangement.Top
         ) {
 
-            MovieRow(movie = movie, onFavClick = {movieId -> moviesViewModel.likeFavoriteMovies(movieId)})
+            MovieRow(
+                movie = movie,
+                onFavClick = { movie ->
+                    onFavClick(movie)
+                }
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 

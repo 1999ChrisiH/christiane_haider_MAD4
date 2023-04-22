@@ -2,34 +2,46 @@ package com.example.movieappmad23.viewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.movieappmad23.models.Genre
 import com.example.movieappmad23.models.ListItemSelectable
 import com.example.movieappmad23.models.Movie
-import com.example.movieappmad23.models.getMovies
+import com.example.movieappmad23.repositories.MovieRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class MoviesViewModel: ViewModel(){
-    private val _movieList = getMovies().toMutableStateList()
-    val movieList: List<Movie>
-    get() = _movieList
+class MoviesViewModel(private val repository: MovieRepository): ViewModel(){
+    private val _movieList = MutableStateFlow(listOf<Movie>())
+    val movies: StateFlow<List<Movie>> = _movieList.asStateFlow()
 
-    private val _favoriteMovies = mutableListOf<Movie>().toMutableStateList()
-    val favoriteMovies: List<Movie>
-        get() = _favoriteMovies
+    private val _favoriteMovies = MutableStateFlow(listOf<Movie>())
+    val favoriteMovies: StateFlow<List<Movie>> = _favoriteMovies.asStateFlow()
 
-    fun likeFavoriteMovies(movie: Movie) {
-        _movieList.find { it.id == movie.id }?.let { task ->
-            task.isFavorite = !task.isFavorite
-            if (task.isFavorite) {
-                _favoriteMovies.add(movie)
-            } else {
-                _favoriteMovies.remove(movie)
+    init {
+        viewModelScope.launch {
+            repository.getAllMovies().collect { movieList -> // Daten aus Flow wieder einsammeln
+                if (!movieList.isNullOrEmpty()) {
+                    _movieList.value = movieList
+                }
+            }
+            repository.getFavoriteMovies().collect{ favoritesList ->
+                if(!favoritesList.isNullOrEmpty()){
+                    _favoriteMovies.value = favoritesList
+                }
             }
         }
     }
+    //suspend um zu deklarieren dass sie auch in Threads arbeiten können (long running)
+    // suspend functions müssen in  Coroutines aufgerufen werden
+    suspend fun likeFavoriteMovie(movie: Movie) {
+        movie.isFavorite = !movie.isFavorite
+        repository.update(movie)
+    }
 
-    fun addMovie(
+    suspend fun addMovie(
         title: String,
         year: String,
         genres: List<Genre>,
@@ -49,7 +61,7 @@ class MoviesViewModel: ViewModel(){
             rating = rating.toFloat(),
             images = listOf("https://thumbs.dreamstime.com/b/no-image-available-icon-photo-camera-flat-vector-illustration-132483141.jpg")
         )
-        _movieList.add(newMovie)
+        repository.add(newMovie)
 
     }
 
@@ -153,6 +165,10 @@ class MoviesViewModel: ViewModel(){
             }
         }
         enableAddButton()
+    }
+
+    fun saveMovie() {
+        TODO("Not yet implemented")
     }
 
 }

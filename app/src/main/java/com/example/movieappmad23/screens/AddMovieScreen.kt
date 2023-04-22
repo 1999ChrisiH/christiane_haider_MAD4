@@ -21,6 +21,8 @@ import com.example.movieappmad23.R
 import com.example.movieappmad23.models.Genre
 import com.example.movieappmad23.viewmodel.MoviesViewModel
 import com.example.movieappmad23.widgets.SimpleTopAppBar
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddMovieScreen(navController: NavController, moviesViewModel: MoviesViewModel) {
@@ -62,6 +64,7 @@ fun InputField(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel) {
+    val coroutineScope = rememberCoroutineScope()
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -80,7 +83,7 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
                 label = R.string.enter_movie_title,
                 errorState = moviesViewModel.titleError,
                 validateMethod = {moviesViewModel.validateTitle()}
-                )
+            )
             PrintErrorMsg(value = moviesViewModel.titleError.value, text = stringResource(R.string.invalid_input))
 
             InputField(
@@ -169,19 +172,23 @@ fun MainContent(modifier: Modifier = Modifier, moviesViewModel: MoviesViewModel)
                 enabled = moviesViewModel.addButtonEnabled.value,
                 /*TODO add a new movie to the movie list*/
                 onClick = {
+
                     val genreList: MutableList<Genre> = mutableListOf()
                     moviesViewModel.genreItems.value.filter { it.isSelected }
                         .forEach { genreList.add(Genre.valueOf(it.title)) }
 
-                    moviesViewModel.addMovie(
-                        moviesViewModel.title.value,
-                        moviesViewModel.year.value,
-                        genreList,
-                        moviesViewModel.director.value,
-                        moviesViewModel.actors.value,
-                        moviesViewModel.plot.value,
-                        moviesViewModel.rating.value
-                    )
+                    coroutineScope.launch {
+                        moviesViewModel.addMovie(
+                            moviesViewModel.title.value,
+                            moviesViewModel.year.value,
+                            genreList,
+                            moviesViewModel.director.value,
+                            moviesViewModel.actors.value,
+                            moviesViewModel.plot.value,
+                            moviesViewModel.rating.value
+                        )
+                    }
+
                 }) {
                 Text(text = stringResource(R.string.add))
             }

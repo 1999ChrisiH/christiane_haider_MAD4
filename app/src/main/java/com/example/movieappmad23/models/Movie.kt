@@ -9,21 +9,18 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Movie(
-    @PrimaryKey(autoGenerate = true)
-    val id: String,
-    val title: String,
-    val year: String,
-    val genre: List<Genre>,
-    val director: String,
-    val actors: String,
-    val plot: String,
-    val images: List<String>,
+    @PrimaryKey
+    val id: String = "",
+    val title: String = "",
+    val year: String = "",
+    val genre: List<Genre> = listOf(),
+    val director: String = "",
+    val actors: String = "",
+    val plot: String = "No Plot Available",
+    val images: List<String> = listOf(),
     val rating: Float = 0f,
-    @Ignore
-    var initialFavValue: Boolean = false
-){
-    var isFavorite by mutableStateOf(initialFavValue)
-}
+    var isFavorite: Boolean = false)
+
 
 fun getMovies(): List<Movie> {
     return listOf(
